@@ -34,7 +34,7 @@ def parse_skills(summary_path=None, local_skills_dir=None):
         print("Notice: No markdown summary file specified or found. Provide file path via argument: python build_data.py <file.md>")
         return {"categories": [], "skills": [], "total_skills": 0}
 
-    with open(summary_pathwith open(summary_path, "r", encoding="utf-8") as f:
+    with open(summary_path, "r", encoding="utf-8") as f:
 
         lines = f.readlines()
 

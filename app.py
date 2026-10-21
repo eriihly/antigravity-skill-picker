@@ -1241,10 +1241,22 @@ def launch_desktop_app(url, port):
 
 
 def main():
+    # 首次启动若缺少数据文件，自动从示例模版平滑初始化
+    if not os.path.exists(CONFIG_PATH):
+        example_cfg = os.path.join(APP_DIR, "skills_config.example.json")
+        if os.path.exists(example_cfg):
+            try:
+                shutil.copyfile(example_cfg, CONFIG_PATH)
+            except Exception:
+                pass
+
     if not os.path.exists(DEFAULT_DATA_PATH):
-        build_script = os.path.join(APP_DIR, "src", "build_data.py")
-        if os.path.exists(build_script):
-            subprocess.run([sys.executable, build_script], check=True)
+        example_data = os.path.join(APP_DIR, "src", "skills_data.example.json")
+        if os.path.exists(example_data):
+            try:
+                shutil.copyfile(example_data, DEFAULT_DATA_PATH)
+            except Exception:
+                pass
 
     port = find_free_port()
     start_server(port)
