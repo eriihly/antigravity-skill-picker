@@ -7,37 +7,6 @@
     "⚙️ 后端与数据库",
     "🔍 代码检查与审计"
   ],
-  "total_skills": 5,
-  "skills": [
-    {
-      "name": "python-pro",
-      "category": "💻 核心编程语言",
-      "description": "Python 高阶工程规范、设计模式与性能调优指南",
-      "installed": false
-    },
-    {
-      "name": "frontend-design",
-      "category": "🎨 前端与 UI 框架",
-      "description": "现代 Web 前端设计与组件排版最佳实践",
-      "installed": false
-    },
-    {
-      "name": "code-review",
-      "category": "🔍 代码检查与审计",
-      "description": "自动化静态代码审查与安全架构走查规范",
-      "installed": false
-    },
-    {
-      "name": "systematic-debugging",
-      "category": "⚡ 通用规范与工作流",
-      "description": "系统化 Bug 根因分析与回归测试流程",
-      "installed": false
-    },
-    {
-      "name": "writing-plans",
-      "category": "⚡ 通用规范与工作流",
-      "description": "结构化需求拆解与技术交付方案制定",
-      "installed": false
-    }
-  ]
+  "total_skills": 0,
+  "skills": []
 }
