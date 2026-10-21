@@ -1,12 +1,11 @@
 @echo off
-chcp 65001 >nul
 cd /d "%~dp0"
 python app.py
 if errorlevel 1 (
     echo.
     echo ===================================================
-    echo Antigravity Skill Studio 启动失败
-    echo 请确认已安装 Python 并执行以下依赖安装命令:
+    echo Antigravity Skill Studio failed to start.
+    echo Please ensure Python and dependencies are installed:
     echo     pip install -r requirements.txt
     echo ===================================================
     echo.
