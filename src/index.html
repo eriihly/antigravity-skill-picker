@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="msapplication-navbutton-color" content="#FFFFFF">
+  <title>Antigravity Skill Studio</title>
+  
+  <!-- 100% Self-Contained, Zero External CDN Dependency, Instant Loading Stylesheet -->
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #FFFFFF;
+      color: #111827;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      background-color: #FFFFFF;
+    }
+
+    .card-description, .card-skill-handle, .token-session-name, .modal-subtitle {
+      user-select: text;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F9FAFB;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    /* Frameless Window Custom Titlebar (Pure White, Zero Cyan Accent) */
+    .titlebar {
+      height: 38px;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E5E7EB;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      flex-shrink: 0;
+      z-index: 50;
+      -webkit-app-region: drag;
+    }
+    .titlebar-drag-handle {
+      -webkit-app-region: drag;
+      cursor: default;
+    }
+    .titlebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 12px;
+      color: #111827;
+      pointer-events: none;
+    }
+    .titlebar-logo {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: #111827;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      -webkit-app-region: no-drag;
+    }
+    .win-btn {
+      width: 32px;
+      height: 28px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #4B5563;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .win-btn:hover {
+      background: #F3F4F6;
+      color: #111827;
+    }
+    .win-btn-close:hover {
+      background: #EF4444;
+      color: #FFFFFF;
+    }
+
+    /* Main Dashboard Header */
+    .header-panel {
+      padding: 14px 20px;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E5E7EB;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    @media (min-width: 900px) {
+      .header-panel {
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-between;
+      }
+    }
+
+    /* Compact Context Token Card (Requirement 2: 紧凑，横向不长，上下有空间) */
+    .token-card {
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 12px 16px;
+      max-width: 500px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .token-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .token-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .token-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: #111827;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .token-session-name {
+      font-weight: 700;
+      font-size: 12px;
+      color: #111827;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 240px;
+    }
+    .token-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .status-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid #A7F3D0;
+      background: #ECFDF5;
+      color: #065F46;
+    }
+    .status-badge.yellow {
+      border-color: #FDE68A;
+      background: #FEF3C7;
+      color: #92400E;
+    }
+    .status-badge.red {
+      border-color: #FECACA;
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 9999px;
+      background: #10B981;
+    }
+    .status-badge.yellow .status-dot {
+      background: #F59E0B;
+    }
+    .status-badge.red .status-dot {
+      background: #EF4444;
+    }
+    .btn-icon-refresh {
+      background: transparent;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      padding: 3px 6px;
+      font-size: 11px;
+      cursor: pointer;
+      color: #4B5563;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-icon-refresh:hover {
+      background: #E5E7EB;
+      color: #111827;
+    }
+    .token-card-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .token-numbers-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .token-huge-num {
+      font-size: 18px;
+      font-weight: 800;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #111827;
+      letter-spacing: -0.5px;
+    }
+    .token-pct-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6B7280;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .progress-bar-track {
+      width: 100%;
+      height: 6px;
+      background: #E5E7EB;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: #10B981;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    /* Right Controls in Header */
+    .controls-panel {
+      flex: 1;
+      max-width: 540px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .search-box-wrap {
+      position: relative;
+      width: 100%;
+    }
+    .search-input {
+      width: 100%;
+      height: 36px;
+      padding: 0 32px 0 32px;
+      border-radius: 8px;
+      border: 1px solid #E5E7EB;
+      background: #F9FAFB;
+      font-size: 12px;
+      color: #111827;
+      outline: none;
+      transition: border 0.15s, background 0.15s;
+    }
+    .search-input:focus {
+      background: #FFFFFF;
+      border-color: #111827;
+    }
+    .search-icon-left {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: #9CA3AF;
+      pointer-events: none;
+    }
+    .search-clear-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 12px;
+      color: #9CA3AF;
+      cursor: pointer;
+      display: none;
+    }
+    .controls-subrow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sort-control-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .custom-select {
+      height: 28px;
+      padding: 0 8px;
+      border-radius: 6px;
+      border: 1px solid #E5E7EB;
+      background: #F9FAFB;
+      font-size: 11px;
+      color: #111827;
+      outline: none;
+      cursor: pointer;
+    }
+    .btn-toggle-installed {
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 6px;
+      border: 1px solid #E5E7EB;
+      background: #F9FAFB;
+      color: #374151;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-toggle-installed.active {
+      background: #111827;
+      color: #FFFFFF;
+      border-color: #111827;
+    }
+    .btn-category-mgr {
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 6px;
+      border: 1px solid #D1D5DB;
+      background: #FFFFFF;
+      color: #111827;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-category-mgr:hover {
+      background: #F3F4F6;
+      border-color: #111827;
+    }
+
+    /* Category Navigation Bar */
+    .category-navbar {
+      padding: 10px 20px;
+      background: #F9FAFB;
+      border-bottom: 1px solid #E5E7EB;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .category-navbar::-webkit-scrollbar {
+      display: none;
+    }
+    .cat-pill {
+      padding: 5px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid #E5E7EB;
+      background: #FFFFFF;
+      color: #374151;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .cat-pill:hover {
+      background: #F3F4F6;
+      color: #111827;
+    }
+    .cat-pill.active {
+      background: #111827;
+      border-color: #111827;
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+    .cat-pill-fav {
+      background: #FEF3C7;
+      border-color: #FCD34D;
+      color: #92400E;
+      font-weight: 600;
+    }
+    .cat-pill-fav:hover {
+      background: #FDE68A;
+    }
+    .cat-pill-fav.active {
+      background: #F59E0B;
+      border-color: #F59E0B;
+      color: #FFFFFF;
+    }
+
+    /* Dedicated Main Scroll View (Flex 1, min-height 0, allows native wheel & drag scrolling in any window size) */
+    .main-scroll-view {
+      flex: 1;
+      min-height: 0;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      outline: none;
+      position: relative;
+      touch-action: pan-y;
+      background-color: #FFFFFF;
+    }
+    .main-scroll-view::-webkit-scrollbar {
+      width: 8px;
+    }
+    .main-scroll-view::-webkit-scrollbar-track {
+      background: #F9FAFB;
+    }
+    .main-scroll-view::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 4px;
+    }
+    .main-scroll-view::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    /* Main Grid Area (Requirement 3: 每个格子大一点，不要挤太多) */
+    .content-area {
+      padding: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    /* Skill Card Design: Pure White, Spacious, Zero Blue Border */
+    .skill-card {
+      contain: content;
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 154px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .skill-card:hover {
+      border-color: #9CA3AF;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .skill-card.is-fav {
+      border-color: #FCD34D;
+      background: #FFFDF7;
+    }
+    .card-top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .card-skill-handle {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 700;
+      font-size: 14px;
+      color: #111827;
+      cursor: pointer;
+      word-break: break-all;
+    }
+    .card-skill-handle:hover {
+      color: #2563EB;
+      text-decoration: underline;
+    }
+    .card-star-btn {
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: #F59E0B;
+      flex-shrink: 0;
+      transition: transform 0.15s;
+    }
+    .card-star-btn:hover {
+      transform: scale(1.25);
+    }
+    .card-cat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .card-category-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #F3F4F6;
+      border: 1px solid #E5E7EB;
+      color: #4B5563;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 85%;
+    }
+    .card-category-tag:hover {
+      background: #E5E7EB;
+      color: #111827;
+    }
+    .card-install-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 9999px;
+      background: #10B981;
+      flex-shrink: 0;
+    }
+    .card-install-dot.not-installed {
+      background: #D1D5DB;
+    }
+    .card-description {
+      font-size: 12px;
+      color: #4B5563;
+      line-height: 1.6;
+      margin-bottom: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 42px;
+    }
+    .card-bottom-row {
+      padding-top: 10px;
+      border-top: 1px solid #F3F4F6;
+    }
+    .card-copy-btn {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #E5E7EB;
+      background: #F9FAFB;
+      color: #1F2937;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .card-copy-btn:hover {
+      background: #111827;
+      border-color: #111827;
+      color: #FFFFFF;
+    }
+    .card-copy-btn.copied {
+      background: #059669 !important;
+      border-color: #059669 !important;
+      color: #FFFFFF !important;
+    }
+
+    /* Modal System */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+      display: none;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal-box {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 14px;
+      padding: 24px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      position: relative;
+    }
+    .modal-box-large {
+      max-width: 520px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 14px;
+      color: #9CA3AF;
+      cursor: pointer;
+    }
+    .modal-close-btn:hover {
+      color: #111827;
+    }
+    .modal-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+    .modal-subtitle {
+      font-size: 12px;
+      color: #6B7280;
+      margin-bottom: 16px;
+    }
+    .modal-input {
+      width: 100%;
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 8px;
+      border: 1px solid #E5E7EB;
+      background: #F9FAFB;
+      font-size: 12px;
+      color: #111827;
+      outline: none;
+      margin-top: 4px;
+      margin-bottom: 12px;
+    }
+    .modal-input:focus {
+      background: #FFFFFF;
+      border-color: #111827;
+    }
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .btn-secondary {
+      padding: 7px 14px;
+      border-radius: 6px;
+      border: 1px solid #E5E7EB;
+      background: #FFFFFF;
+      color: #374151;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-secondary:hover {
+      background: #F3F4F6;
+    }
+    .btn-primary {
+      padding: 7px 16px;
+      border-radius: 6px;
+      border: 1px solid #111827;
+      background: #111827;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: #000000;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #111827;
+      color: #FFFFFF;
+      padding: 10px 16px;
+      border-radius: 10px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      font-size: 12px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 200;
+      opacity: 0;
+      transform: translateY(16px);
+      pointer-events: none;
+      transition: all 0.25s ease;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Mini Floating Widget Mode (最小化迷你模式：只留上下文框，可拖拽，回归+关闭按键) */
+    body.mini-mode {
+      background: #FFFFFF !important;
+      overflow: hidden !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    body.mini-mode .app-layout {
+      width: 100vw !important;
+      height: 100vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: stretch !important;
+      align-items: stretch !important;
+      background: #FFFFFF !important;
+      overflow: hidden !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    body.mini-mode .titlebar,
+    body.mini-mode .controls-panel,
+    body.mini-mode .category-navbar,
+    body.mini-mode .main-scroll-view,
+    body.mini-mode .modal-overlay,
+    body.mini-mode .toast {
+      display: none !important;
+    }
+    body.mini-mode .header-panel {
+      padding: 6px 10px !important;
+      border: none !important;
+      background: #FFFFFF !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      display: flex !important;
+      align-items: stretch !important;
+      justify-content: stretch !important;
+      box-sizing: border-box !important;
+    }
+    body.mini-mode .token-card {
+      max-width: 100% !important;
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 12px !important;
+      padding: 8px 12px !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+      cursor: move !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      user-select: none !important;
+      background: #F9FAFB !important;
+      box-sizing: border-box !important;
+    }
+    body.mini-mode .token-card * {
+      cursor: move;
+    }
+    body.mini-mode .token-card button,
+    body.mini-mode .token-card input,
+    body.mini-mode .token-card select,
+    body.mini-mode .token-card a {
+      cursor: pointer !important;
+      -webkit-app-region: no-drag !important;
+    }
+
+    .mini-action-btn {
+      display: none !important;
+    }
+    body.mini-mode .mini-action-btn {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 22px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 6px;
+      -webkit-app-region: no-drag !important;
+      cursor: pointer !important;
+    }
+    .btn-mini-restore:hover {
+      background: #111827 !important;
+      color: #FFFFFF !important;
+      border-color: #111827 !important;
+    }
+    .btn-mini-close:hover {
+      background: #EF4444 !important;
+      color: #FFFFFF !important;
+      border-color: #EF4444 !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main Desktop Layout (Fixed Top Bars + Independent Scrolling Viewport) -->
+  <div class="app-layout">
+
+    <!-- ======================================================== -->
+    <!-- 1. Custom Frameless Titlebar (Pure White, Restricted Drag Handle) -->
+    <!-- ======================================================== -->
+    <div class="titlebar titlebar-drag-handle">
+      <div class="titlebar-brand">
+        <div class="titlebar-logo">⚡</div>
+        <span>Antigravity Skill Studio</span>
+      </div>
+      <div class="window-controls">
+        <button class="win-btn" onclick="winMinimize(event)" title="最小化">—</button>
+        <button class="win-btn" onclick="winMaximize(event)" title="最大化">□</button>
+        <button class="win-btn win-btn-close" onclick="winClose(event)" title="关闭">✕</button>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- 2. Header Area: Token Monitor + Search & Controls (Pinned Top) -->
+    <!-- ======================================================== -->
+    <div class="header-panel">
+      
+      <!-- Token Card (紧凑，横向不长，上下有空间) -->
+      <div class="token-card">
+        <div class="token-card-top">
+          <div class="token-title-wrap">
+            <div class="token-icon">⚡</div>
+            <div>
+              <div style="font-size: 10px; color: #9CA3AF; font-weight: 600;">当前会话上下文</div>
+              <div class="token-session-name" id="mon-title" title="检测中...">检测中...</div>
+            </div>
+          </div>
+
+          <div class="token-actions">
+            <div id="mon-status-pill" class="status-badge">
+              <span class="status-dot"></span>
+              <span id="mon-status-desc">黄金区间</span>
+            </div>
+            <button onmousedown="event.stopPropagation()" onclick="manualRefreshTokens(event)" class="btn-icon-refresh" id="btn-refresh-mon" title="立即刷新">
+              🔄
+            </button>
+            <button onmousedown="event.stopPropagation()" onclick="exitMiniMode(event)" class="btn-icon-refresh btn-mini-restore mini-action-btn" title="回归原窗口">
+              ⤢
+            </button>
+            <button onmousedown="event.stopPropagation()" onclick="winClose(event)" class="btn-icon-refresh btn-mini-close mini-action-btn" title="关闭应用">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div class="token-card-bottom">
+          <div class="token-numbers-row">
+            <div>
+              <span class="token-huge-num" id="mon-tokens">-- k</span>
+              <span style="font-size: 11px; color: #6B7280; margin-left: 4px;">已用 Token</span>
+            </div>
+            <div class="token-pct-text">
+              <span id="mon-pct-text">--%</span> / 1.0M
+            </div>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="mon-progress-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Controls Area: Search + Sort + Category Manager -->
+      <div class="controls-panel">
+        <!-- Search Input -->
+        <div class="search-box-wrap">
+          <span class="search-icon-left">🔍</span>
+          <input 
+            id="search-input" 
+            type="text" 
+            placeholder="搜索技能名称、描述、关键词 (例如: python, 架构, ppt, 安全)..." 
+            class="search-input"
+            oninput="handleSearch()"
+          />
+          <button id="clear-search" onclick="clearSearch()" class="search-clear-btn">✕</button>
+        </div>
+
+        <!-- Controls Subrow -->
+        <div class="controls-subrow">
+          <div class="sort-control-group">
+            <span style="color: #6B7280;">排序:</span>
+            <select id="sort-select" onchange="handleSortChange()" class="custom-select">
+              <option value="default">默认分类顺序</option>
+              <option value="fav-first">⭐ 收藏技能优先</option>
+              <option value="name-asc">技能名称 (A → Z)</option>
+              <option value="name-desc">技能名称 (Z → A)</option>
+              <option value="desc-len">描述详尽程度</option>
+            </select>
+
+            <button id="filter-installed-btn" onclick="toggleInstalledFilter()" class="btn-toggle-installed">
+              <span id="filter-installed-icon">⚪</span> 仅看已装
+            </button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button onclick="openCategoryManager()" class="btn-category-mgr" title="自由增删改分类">
+              <span>📁</span> 分类管理
+            </button>
+            <span id="stat-count-badge" style="padding: 4px 10px; border-radius: 6px; background: #F3F4F6; color: #4B5563; font-size: 11px; font-weight: 600;">
+              127 个技能
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- 3. Category Tabs (Pinned Below Header) -->
+    <!-- ======================================================== -->
+    <div class="category-navbar">
+      <button onclick="selectCategory('ALL')" id="cat-tab-ALL" class="cat-pill active">
+        🌟 全部 (<span id="count-all">0</span>)
+      </button>
+      <button onclick="selectCategory('FAVORITES')" id="cat-tab-FAVORITES" class="cat-pill cat-pill-fav">
+        ⭐ 我的收藏 (<span id="count-favorites">0</span>)
+      </button>
+      <div id="category-tabs-container" style="display: flex; gap: 8px;">
+        <!-- Dynamic categories -->
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- 4. Content Area (Dedicated Scroll Viewport for Windowed & Fullscreen) -->
+    <!-- ======================================================== -->
+    <div class="main-scroll-view" id="main-scroll-view" tabindex="0">
+      <div class="content-area">
+        <div class="cards-grid" id="cards-container">
+          <!-- Spacious cards rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.app-layout -->
+
+  <!-- ======================================================== -->
+  <!-- 5. Toast Notification -->
+  <!-- ======================================================== -->
+  <div id="toast" class="toast">
+    <span style="color: #10B981; font-weight: 700;">✓</span>
+    <span id="toast-msg">已复制到剪贴板！</span>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 6. Modal: Edit Skill Category -->
+  <!-- ======================================================== -->
+  <div id="edit-category-modal" class="modal-overlay">
+    <div class="modal-box">
+      <button onclick="closeEditCategoryModal()" class="modal-close-btn">✕</button>
+      <div class="modal-title">✏️ 修改技能所属分类</div>
+      <div class="modal-subtitle" id="edit-skill-name">@skill-name</div>
+
+      <label style="font-size: 11px; color: #4B5563; font-weight: 600;">选择已有分类：</label>
+      <select id="modal-category-select" class="custom-select" style="width: 100%; height: 36px; margin: 6px 0 12px 0;">
+        <!-- Populated dynamically -->
+      </select>
+
+      <label style="font-size: 11px; color: #4B5563; font-weight: 600;">或者输入新分类名称：</label>
+      <input id="modal-new-category-input" type="text" placeholder="例如: 🎯 业务定制技能" class="modal-input" />
+
+      <div class="modal-actions">
+        <button onclick="closeEditCategoryModal()" class="btn-secondary">取消</button>
+        <button onclick="saveSkillCategoryChange()" class="btn-primary">确定修改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 7. Modal: Category Manager -->
+  <!-- ======================================================== -->
+  <div id="category-manager-modal" class="modal-overlay">
+    <div class="modal-box modal-box-large">
+      <button onclick="closeCategoryManager()" class="modal-close-btn">✕</button>
+      <div class="modal-title">📁 分类管理与自定义</div>
+      <div class="modal-subtitle">自由新增、重命名或重排分类，修改后自动保存。</div>
+
+      <!-- Add New Category -->
+      <div style="background: #F9FAFB; padding: 10px; border-radius: 8px; border: 1px solid #E5E7EB; margin-bottom: 12px; display: flex; gap: 8px;">
+        <input id="new-cat-input" type="text" placeholder="输入分类名称 (例如: 💡 架构设计)" class="modal-input" style="margin: 0; flex: 1;" />
+        <button onclick="addNewCategory()" class="btn-primary" style="white-space: nowrap;">+ 添加分类</button>
+      </div>
+
+      <!-- Category List Scroll Area -->
+      <div id="category-manager-list" style="overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 6px; padding-right: 4px;">
+        <!-- Categories list -->
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 12px; border-top: 1px solid #E5E7EB;">
+        <span style="font-size: 11px; color: #6B7280;">共 <span id="cat-total-count" style="font-weight: 700; color: #111827;">0</span> 个分类</span>
+        <button onclick="closeCategoryManager()" class="btn-primary">完成并关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 8. Script: Pure Local Logic, Zero CDN Wait -->
+  <!-- ======================================================== -->
+  <script>
+    let appData = {
+      categories: [],
+      skills: [],
+      favorites: []
+    };
+
+    let activeCategory = "ALL";
+    let searchQuery = "";
+    let sortMode = "default";
+    let filterInstalledOnly = false;
+    let currentEditingSkill = null;
+
+    // Window controls
+    function setMiniMode(isMini) {
+      const tokenCard = document.querySelector(".token-card");
+      if (isMini) {
+        document.body.classList.add("mini-mode");
+        if (tokenCard) tokenCard.classList.add("titlebar-drag-handle");
+      } else {
+        document.body.classList.remove("mini-mode");
+        if (tokenCard) tokenCard.classList.remove("titlebar-drag-handle");
+      }
+    }
+
+    async function winMinimize(e) {
+      if (e) e.stopPropagation();
+      setMiniMode(true);
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.enter_mini_mode) {
+        try {
+          await window.pywebview.api.enter_mini_mode();
+        } catch (err) {
+          console.error("enter_mini_mode failed:", err);
+        }
+      }
+    }
+
+    async function exitMiniMode(e) {
+      if (e) e.stopPropagation();
+      setMiniMode(false);
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.exit_mini_mode) {
+        try {
+          await window.pywebview.api.exit_mini_mode();
+        } catch (err) {
+          console.error("exit_mini_mode failed:", err);
+        }
+      }
+    }
+
+    function winMaximize(e) {
+      if (e) e.stopPropagation();
+      if (document.body.classList.contains("mini-mode")) {
+        exitMiniMode(e);
+        return;
+      }
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.maximize) {
+        window.pywebview.api.maximize();
+      }
+    }
+
+    function winClose(e) {
+      if (e) e.stopPropagation();
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.close) {
+        window.pywebview.api.close();
+      } else {
+        window.close();
+      }
+    }
+
+    // Escape key restores from mini mode
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && document.body.classList.contains("mini-mode")) {
+        exitMiniMode(e);
+      }
+    });
+
+    // Initialization
+    window.addEventListener("DOMContentLoaded", async () => {
+      await loadInitialData();
+      renderCategoryTabs();
+      renderCards();
+
+      // Double-click token card in mini mode restores full window
+      const tokenCardElem = document.querySelector(".token-card");
+      if (tokenCardElem) {
+        tokenCardElem.addEventListener("dblclick", (e) => {
+          if (document.body.classList.contains("mini-mode")) {
+            if (!e.target.closest("button, input, select")) {
+              exitMiniMode(e);
+            }
+          }
+        });
+      }
+
+      // Start token monitor
+      pollTokenMonitor();
+      setInterval(pollTokenMonitor, 2000);
+    });
+
+    // Token Monitor Polling
+    async function pollTokenMonitor() {
+      try {
+        const resp = await fetch("/api/token");
+        if (resp.ok) {
+          const data = await resp.json();
+          updateTokenDisplay(data);
+        }
+      } catch (e) {}
+    }
+
+    function manualRefreshTokens(e) {
+      if (e) e.stopPropagation();
+      const btn = document.getElementById("btn-refresh-mon");
+      btn.style.transform = "rotate(360deg)";
+      btn.style.transition = "transform 0.4s ease";
+      pollTokenMonitor().finally(() => {
+        setTimeout(() => {
+          btn.style.transform = "";
+          btn.style.transition = "";
+        }, 500);
+      });
+      showToast("已刷新上下文监测数据");
+    }
+
+    function updateTokenDisplay(data) {
+      if (!data || data.status === "empty") return;
+
+      document.getElementById("mon-title").textContent = data.title || "活跃会话";
+      document.getElementById("mon-title").title = data.title || "";
+      document.getElementById("mon-tokens").textContent = data.k_val || "-- k";
+      document.getElementById("mon-status-desc").textContent = (data.desc || "正常区间").replace(/（.*）|\(.*\)/g, "").trim();
+      document.getElementById("mon-pct-text").textContent = data.percentage || "--%";
+
+      const bar = document.getElementById("mon-progress-bar");
+      bar.style.width = Math.min(100, Math.max(3, data.pct_num)) + "%";
+
+      const pill = document.getElementById("mon-status-pill");
+      pill.className = "status-badge";
+      if (data.level === "green") {
+        bar.style.background = "#10B981";
+      } else if (data.level === "yellow") {
+        pill.classList.add("yellow");
+        bar.style.background = "#F59E0B";
+      } else {
+        pill.classList.add("red");
+        bar.style.background = "#EF4444";
+      }
+    }
+
+    // Data Loading & Saving
+    async function loadInitialData() {
+      try {
+        const resp = await fetch("/api/data");
+        if (resp.ok) {
+          appData = await resp.json();
+          if (!appData.favorites) appData.favorites = [];
+          return;
+        }
+      } catch (e) {}
+
+      const localSaved = localStorage.getItem("antigravity_skills_config");
+      if (localSaved) {
+        try {
+          appData = JSON.parse(localSaved);
+          if (!appData.favorites) appData.favorites = [];
+          return;
+        } catch (e) {}
+      }
+
+      try {
+        const resp = await fetch("skills_data.json");
+        if (resp.ok) {
+          appData = await resp.json();
+          if (!appData.favorites) appData.favorites = [];
+        }
+      } catch (e) {}
+    }
+
+    async function persistData() {
+      try {
+        localStorage.setItem("antigravity_skills_config", JSON.stringify(appData));
+      } catch (e) {}
+
+      try {
+        await fetch("/api/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(appData)
+        });
+      } catch (e) {}
+    }
+
+    // Category Tabs Rendering
+    function renderCategoryTabs() {
+      const container = document.getElementById("category-tabs-container");
+      container.innerHTML = "";
+
+      document.getElementById("count-all").textContent = appData.skills.length;
+      document.getElementById("count-favorites").textContent = appData.favorites.length;
+
+      appData.categories.forEach(cat => {
+        const count = appData.skills.filter(s => s.category === cat).length;
+        const btn = document.createElement("button");
+        btn.id = "cat-tab-" + encodeURIComponent(cat);
+        btn.className = "cat-pill";
+        btn.innerHTML = `${cat} <span style="opacity: 0.6; font-size: 11px;">(${count})</span>`;
+        btn.onclick = () => selectCategory(cat);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll(".cat-pill").forEach(tab => {
+        tab.classList.remove("active");
+      });
+
+      if (cat === "ALL") {
+        document.getElementById("cat-tab-ALL").classList.add("active");
+      } else if (cat === "FAVORITES") {
+        document.getElementById("cat-tab-FAVORITES").classList.add("active");
+      } else {
+        const targetTab = document.getElementById("cat-tab-" + encodeURIComponent(cat));
+        if (targetTab) targetTab.classList.add("active");
+      }
+
+      renderCards();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById("search-input").value.trim().toLowerCase();
+      document.getElementById("clear-search").style.display = searchQuery ? "block" : "none";
+      renderCards();
+    }
+
+    function clearSearch() {
+      document.getElementById("search-input").value = "";
+      searchQuery = "";
+      document.getElementById("clear-search").style.display = "none";
+      renderCards();
+    }
+
+    function handleSortChange() {
+      sortMode = document.getElementById("sort-select").value;
+      renderCards();
+    }
+
+    function toggleInstalledFilter() {
+      filterInstalledOnly = !filterInstalledOnly;
+      const btn = document.getElementById("filter-installed-btn");
+      const icon = document.getElementById("filter-installed-icon");
+      if (filterInstalledOnly) {
+        btn.classList.add("active");
+        icon.textContent = "🟢";
+      } else {
+        btn.classList.remove("active");
+        icon.textContent = "⚪";
+      }
+      renderCards();
+    }
+
+    function toggleFavorite(skillName, e) {
+      if (e) e.stopPropagation();
+      const idx = appData.favorites.indexOf(skillName);
+      if (idx > -1) {
+        appData.favorites.splice(idx, 1);
+        showToast(`已移出收藏: @${skillName}`);
+      } else {
+        appData.favorites.push(skillName);
+        showToast(`⭐ 已收藏 @${skillName}！`);
+      }
+      persistData();
+      document.getElementById("count-favorites").textContent = appData.favorites.length;
+      renderCards();
+    }
+
+    function getFilteredSkills() {
+      let list = [...appData.skills];
+
+      if (activeCategory === "FAVORITES") {
+        list = list.filter(s => appData.favorites.includes(s.name));
+      } else if (activeCategory !== "ALL") {
+        list = list.filter(s => s.category === activeCategory);
+      }
+
+      if (filterInstalledOnly) {
+        list = list.filter(s => s.installed);
+      }
+
+      if (searchQuery) {
+        list = list.filter(s => {
+          return s.name.toLowerCase().includes(searchQuery) ||
+                 s.description.toLowerCase().includes(searchQuery) ||
+                 s.category.toLowerCase().includes(searchQuery);
+        });
+      }
+
+      if (sortMode === "fav-first") {
+        list.sort((a, b) => {
+          const aFav = appData.favorites.includes(a.name) ? 1 : 0;
+          const bFav = appData.favorites.includes(b.name) ? 1 : 0;
+          return bFav - aFav;
+        });
+      } else if (sortMode === "name-asc") {
+        list.sort((a, b) => a.name.localeCompare(b.name));
+      } else if (sortMode === "name-desc") {
+        list.sort((a, b) => b.name.localeCompare(a.name));
+      } else if (sortMode === "desc-len") {
+        list.sort((a, b) => b.description.length - a.description.length);
+      }
+
+      return list;
+    }
+
+    // Render Spacious Cards (Requirement 3: 每个格子大一点，不要挤太多)
+    function renderCards() {
+      const container = document.getElementById("cards-container");
+      const filtered = getFilteredSkills();
+
+      document.getElementById("stat-count-badge").textContent = `${filtered.length} / ${appData.skills.length} 个技能`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 60px 0; color: #9CA3AF;">
+            <div style="font-size: 32px; margin-bottom: 8px;">${activeCategory === "FAVORITES" ? "⭐" : "🔍"}</div>
+            <div style="font-size: 14px; font-weight: 600; color: #374151;">${activeCategory === "FAVORITES" ? "暂无收藏技能，点击卡片右上角 ⭐ 即可加入收藏" : "未找到匹配的 Skill"}</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(s => renderSpaciousCard(s)).join("");
+    }
+
+    function renderSpaciousCard(skill) {
+      const isFav = appData.favorites.includes(skill.name);
+      const isLocal = skill.installed;
+
+      return `
+        <div class="skill-card ${isFav ? 'is-fav' : ''}">
+          <div>
+            <div class="card-top-row">
+              <span class="card-skill-handle" onclick="copySkillText('${skill.name}', this)" title="点击快速复制">
+                @${skill.name}
+              </span>
+              <button class="card-star-btn" onclick="toggleFavorite('${skill.name}', event)" title="${isFav ? '取消收藏' : '添加收藏'}">
+                ${isFav ? "⭐" : "☆"}
+              </button>
+            </div>
+
+            <div class="card-cat-row">
+              <span class="card-category-tag" onclick="openEditCategoryModal('${skill.name}')" title="分类: ${skill.category} (点击修改分类)">
+                ${skill.category} ✏️
+              </span>
+              <span class="card-install-dot ${isLocal ? '' : 'not-installed'}" title="${isLocal ? '本地已装' : '未装'}"></span>
+            </div>
+
+            <p class="card-description" title="${skill.description}">
+              ${skill.description}
+            </p>
+          </div>
+
+          <div class="card-bottom-row">
+            <button class="card-copy-btn" onclick="copySkillText('${skill.name}', this)">
+              <span>📋</span>
+              <span>复制插入</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function copySkillText(skillName, btnElem) {
+      const textToCopy = `@${skillName} `;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        let btn = btnElem;
+        if (btnElem && !btnElem.classList.contains("card-copy-btn")) {
+          const card = btnElem.closest(".skill-card");
+          if (card) btn = card.querySelector(".card-copy-btn");
+        }
+        if (btn) {
+          const original = btn.innerHTML;
+          btn.innerHTML = `<span>✓</span><span>已复制！</span>`;
+          btn.classList.add("copied");
+          setTimeout(() => {
+            btn.innerHTML = original;
+            btn.classList.remove("copied");
+          }, 1500);
+        }
+        showToast(`已复制 "@${skillName}"！直接按 Ctrl+V 发送`);
+      }).catch(err => {
+        prompt("请手动复制：", textToCopy);
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-msg").textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2000);
+    }
+
+    // Modal Operations
+    function openEditCategoryModal(skillName) {
+      currentEditingSkill = skillName;
+      const skill = appData.skills.find(s => s.name === skillName);
+      if (!skill) return;
+
+      document.getElementById("edit-skill-name").textContent = `@${skill.name} (当前: ${skill.category})`;
+      const select = document.getElementById("modal-category-select");
+      select.innerHTML = "";
+      appData.categories.forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        if (cat === skill.category) opt.selected = true;
+        select.appendChild(opt);
+      });
+
+      document.getElementById("modal-new-category-input").value = "";
+      document.getElementById("edit-category-modal").classList.add("open");
+    }
+
+    function closeEditCategoryModal() {
+      document.getElementById("edit-category-modal").classList.remove("open");
+      currentEditingSkill = null;
+    }
+
+    async function saveSkillCategoryChange() {
+      if (!currentEditingSkill) return;
+      const skill = appData.skills.find(s => s.name === currentEditingSkill);
+      if (!skill) return;
+
+      const newCatInput = document.getElementById("modal-new-category-input").value.trim();
+      let targetCat = "";
+
+      if (newCatInput) {
+        targetCat = newCatInput;
+        if (!appData.categories.includes(targetCat)) {
+          appData.categories.push(targetCat);
+        }
+      } else {
+        targetCat = document.getElementById("modal-category-select").value;
+      }
+
+      if (!targetCat) return;
+
+      skill.category = targetCat;
+      await persistData();
+      renderCategoryTabs();
+      renderCards();
+      closeEditCategoryModal();
+
+      showToast(`已将 @${skill.name} 移动至 [${targetCat}]！`);
+    }
+
+    function openCategoryManager() {
+      renderCategoryManagerList();
+      document.getElementById("category-manager-modal").classList.add("open");
+    }
+
+    function closeCategoryManager() {
+      document.getElementById("category-manager-modal").classList.remove("open");
+      renderCategoryTabs();
+      renderCards();
+    }
+
+    function renderCategoryManagerList() {
+      const container = document.getElementById("category-manager-list");
+      container.innerHTML = "";
+      document.getElementById("cat-total-count").textContent = appData.categories.length;
+
+      appData.categories.forEach((cat, index) => {
+        const count = appData.skills.filter(s => s.category === cat).length;
+        const item = document.createElement("div");
+        item.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 12px;";
+        item.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
+            <span style="font-size: 11px; color: #9CA3AF; font-family: monospace;">${index + 1}</span>
+            <span style="font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${cat}</span>
+            <span style="font-size: 10px; padding: 2px 6px; border-radius: 9999px; background: #FFFFFF; border: 1px solid #E5E7EB; color: #6B7280;">${count} 个</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button onclick="moveCategory(${index}, -1)" ${index === 0 ? 'disabled style="opacity: 0.3;"' : ''} style="background: none; border: none; cursor: pointer; padding: 2px 4px;">⬆️</button>
+            <button onclick="moveCategory(${index}, 1)" ${index === appData.categories.length - 1 ? 'disabled style="opacity: 0.3;"' : ''} style="background: none; border: none; cursor: pointer; padding: 2px 4px;">⬇️</button>
+            <button onclick="renameCategory(${index})" style="background: none; border: none; cursor: pointer; color: #2563EB; font-size: 11px; padding: 2px 6px;">改名</button>
+            <button onclick="deleteCategory(${index})" style="background: none; border: none; cursor: pointer; color: #DC2626; font-size: 11px; padding: 2px 6px;">删除</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    async function addNewCategory() {
+      const input = document.getElementById("new-cat-input");
+      const name = input.value.trim();
+      if (!name) return;
+      if (appData.categories.includes(name)) {
+        alert("分类已存在！");
+        return;
+      }
+      appData.categories.push(name);
+      input.value = "";
+      await persistData();
+      renderCategoryManagerList();
+      showToast(`已添加分类：${name}`);
+    }
+
+    async function renameCategory(index) {
+      const oldName = appData.categories[index];
+      const newName = prompt(`请输入分类 [${oldName}] 的新名称：`, oldName);
+      if (!newName || newName.trim() === "" || newName === oldName) return;
+
+      const trimmed = newName.trim();
+      if (appData.categories.includes(trimmed)) {
+        alert("目标分类已存在！");
+        return;
+      }
+
+      appData.categories[index] = trimmed;
+      appData.skills.forEach(s => {
+        if (s.category === oldName) s.category = trimmed;
+      });
+
+      if (activeCategory === oldName) activeCategory = trimmed;
+
+      await persistData();
+      renderCategoryManagerList();
+      showToast(`分类已重命名为 [${trimmed}]`);
+    }
+
+    async function deleteCategory(index) {
+      const catToDelete = appData.categories[index];
+      const count = appData.skills.filter(s => s.category === catToDelete).length;
+
+      if (!confirm(`确认要删除分类 [${catToDelete}] 吗？\n当前该分类下有 ${count} 个技能。`)) {
+        return;
+      }
+
+      let fallbackCat = "⚡ 通用规范与工作流";
+      if (!appData.categories.includes(fallbackCat) && appData.categories.length > 1) {
+        fallbackCat = appData.categories[index === 0 ? 1 : 0];
+      }
+
+      appData.skills.forEach(s => {
+        if (s.category === catToDelete) s.category = fallbackCat;
+      });
+
+      appData.categories.splice(index, 1);
+      if (activeCategory === catToDelete) activeCategory = "ALL";
+
+      await persistData();
+      renderCategoryManagerList();
+      showToast(`已删除分类 [${catToDelete}]`);
+    }
+
+    async function moveCategory(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= appData.categories.length) return;
+
+      const temp = appData.categories[index];
+      appData.categories[index] = appData.categories[targetIndex];
+      appData.categories[targetIndex] = temp;
+
+      await persistData();
+      renderCategoryManagerList();
+    }
+
+    // ==========================================
+    // Native Drag-to-Scroll & Universal Wheel Support
+    // ==========================================
+    (function initDragAndWheelScrolling() {
+      const scrollView = document.getElementById("main-scroll-view");
+      if (!scrollView) return;
+
+      let isDown = false;
+      let startY = 0;
+      let scrollTop = 0;
+      let hasDragged = false;
+      let rafId = null;
+      let targetScrollTop = 0;
+
+      // 1. Mouse Drag-to-Scroll (Only left-click on background/empty space)
+      // Never intercept middle-click (e.button === 1) or right-click (e.button === 2)
+      scrollView.addEventListener("mousedown", (e) => {
+        if (e.button !== 0) return; // Strict: ONLY left mouse button!
+        if (e.target.closest("button, input, select, textarea, a, .card-copy-btn, .card-star-btn, .card-category-tag, .win-btn, .search-box-wrap, .custom-select")) {
+          return;
+        }
+
+        isDown = true;
+        hasDragged = false;
+        startY = e.pageY;
+        scrollTop = scrollView.scrollTop;
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDown) return;
+        const deltaY = e.pageY - startY;
+        if (Math.abs(deltaY) > 3) {
+          hasDragged = true;
+          scrollView.style.cursor = "grabbing";
+          targetScrollTop = scrollTop - deltaY;
+          if (!rafId) {
+            rafId = requestAnimationFrame(() => {
+              scrollView.scrollTop = targetScrollTop;
+              rafId = null;
+            });
+          }
+        }
+      }, { passive: true });
+
+      window.addEventListener("mouseup", () => {
+        if (isDown) {
+          isDown = false;
+          scrollView.style.cursor = "default";
+          if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+          if (hasDragged) {
+            const captureClick = (clickEvent) => {
+              clickEvent.stopPropagation();
+              clickEvent.preventDefault();
+              window.removeEventListener("click", captureClick, true);
+            };
+            window.addEventListener("click", captureClick, true);
+          }
+        }
+      });
+
+      // 2. Category Navbar Horizontal Wheel Scrolling (Shift or plain wheel over category bar)
+      const catNavbar = document.querySelector(".category-navbar");
+      if (catNavbar) {
+        catNavbar.addEventListener("wheel", (e) => {
+          if (e.deltaY !== 0) {
+            catNavbar.scrollLeft += e.deltaY;
+            e.preventDefault();
+          }
+        }, { passive: false });
+      }
+
+      // 3. Focus Assurance for Keyboard Navigation
+      window.addEventListener("DOMContentLoaded", () => {
+        scrollView.focus();
+      });
+      scrollView.addEventListener("click", () => {
+        scrollView.focus();
+      });
+    })();
+  </script>
+</body>
+</html>
